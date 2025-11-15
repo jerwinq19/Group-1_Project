@@ -6,7 +6,8 @@ from django.contrib.auth.models import AbstractUser
 from shortuuid.django_fields import ShortUUIDField
 from django.core.validators import RegexValidator
 from django.utils.text import slugify
-
+from django.utils import timezone
+from datetime import timedelta
 
 class CustomUser(AbstractUser):
     OCCUPATION_STATUS_CHOICES = (
@@ -47,6 +48,12 @@ class CustomUser(AbstractUser):
 
 
 class Room(models.Model):
+    
+    ROOM_AVAILABILITY_CHOICES  = (
+        ('Available', 'Available'),
+        ('Not Available', 'Not Available'),
+    )
+    
     room_id = ShortUUIDField(
         length=5,
         max_length=30,
@@ -65,6 +72,7 @@ class Room(models.Model):
     air_condition = models.BooleanField(default=False)
     comfort_room = models.BooleanField(default=False)
     internet = models.BooleanField(default=False)
+    room_availability = models.CharField(max_length=20, default="Available", choices=ROOM_AVAILABILITY_CHOICES)
     price = models.IntegerField(default=0)
 
     def __str__(self):
@@ -103,8 +111,9 @@ class Reports(models.Model):
         return f"Report {self.report_id} - {self.room.name}"
 
 class RentHistory(models.Model):
-    renter = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    transact_id = ShortUUIDField(length=5, max_length=30, prefix="tr_",alphabet="abcdefg1234", unique=True, editable=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    renter = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     
     def __str__(self):
         return f"{self.renter.username} - {self.room.name}"
@@ -127,15 +136,21 @@ class ActiveRent(models.Model):
         editable=False
     )
 
+    rent_history = models.ForeignKey(RentHistory, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     tenant = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    start_date = models.DateTimeField(auto_now_add=True)
+    start_date = models.DateTimeField(default=timezone.now)
     due_date = models.DateTimeField(null=True, blank=True)
     amount = models.IntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Active")
 
     def __str__(self):
         return f"Rent {self.rent_id} - {self.room.name} by {self.tenant.username}"
+    
+    def save(self, *args, **kwargs):
+        if not self.due_date:
+            self.due_date = self.start_date + timedelta(days=30)
+        return super().save(*args, **kwargs)
 
 
 class Notification(models.Model):

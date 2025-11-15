@@ -24,7 +24,7 @@ class RoomViewSets(viewsets.ModelViewSet):
     queryset = models.Room.objects.all()
     serializer_class = serializers.RoomSerializer
     lookup_field = 'slug_name'
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
 class RentViewSets(viewsets.ModelViewSet):
     ''''
@@ -32,3 +32,18 @@ class RentViewSets(viewsets.ModelViewSet):
     '''
     queryset = models.ActiveRent.objects.all()
     serializer_class = serializers.ActiveRentSerializers
+    permission_classes = [IsAuthenticated]
+
+
+class RentHistoryViewSets(viewsets.ModelViewSet):
+    queryset = models.RentHistory.objects.all()
+    serializer_class = serializers.RentHistorySerializers
+    lookup_field = 'transact_id'
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        '''
+            this means that only the authenticated user can created it.
+        '''
+        rent = serializer.save(renter=self.request.user)
+        return rent

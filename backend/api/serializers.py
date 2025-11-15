@@ -49,3 +49,9 @@ class NotifcationSerializer(serializers.ModelSerializer):
         model = models.Notification
         fields = '__all__'
         read_only_fields = ['notifcation_id', 'renter', 'sender']
+
+
+class RentHistorySerializers(serializers.ModelSerializer):
+    class Meta:
+        model = models.RentHistory
+        exclude = ['id']
