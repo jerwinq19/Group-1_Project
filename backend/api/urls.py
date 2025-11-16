@@ -7,7 +7,7 @@ router = routers.DefaultRouter()
 router.register(f'user', viewsets.CustomUserViewSets)
 router.register(f'room', viewsets.RoomViewSets)
 router.register(f'rent', viewsets.RentViewSets)
-router.register(f'history', viewsets.RentHistoryViewSets)
+router.register(f'transaction', viewsets.RentTransactionViewSets)
 
 
 urlpatterns = [

@@ -136,7 +136,7 @@ class ActiveRent(models.Model):
         editable=False
     )
 
-    rent_history = models.ForeignKey(RentHistory, on_delete=models.CASCADE)
+    rent_transaction = models.ForeignKey(RentHistory, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     tenant = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     start_date = models.DateTimeField(default=timezone.now)

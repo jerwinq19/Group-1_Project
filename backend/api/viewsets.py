@@ -35,7 +35,7 @@ class RentViewSets(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class RentHistoryViewSets(viewsets.ModelViewSet):
+class RentTransactionViewSets(viewsets.ModelViewSet):
     queryset = models.RentHistory.objects.all()
     serializer_class = serializers.RentHistorySerializers
     lookup_field = 'transact_id'
