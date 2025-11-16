@@ -51,3 +51,36 @@ Admin → creates buildings → /buildings/
 Admin → creates rooms under building → /rooms/
 
 –––
+
+USER
+ ├─> Login → Frontend → /api/token/ → Backend
+ │           │
+ │           └─> DB: verify user → JWT returned → stored in Frontend
+ │
+ ├─> View Home (Properties)
+ │           Frontend GET /rooms/ → Backend queries room & building tables → returns list → Frontend renders cards
+ │
+ ├─> View Property Details
+ │           Frontend GET /rooms/<room_id>/ → Backend pulls room+building+availability → returns info → Frontend displays
+ │
+ ├─> Rent Room
+ │           Frontend POST /rooms/<room_id>/rent/ with JWT → Backend
+ │               ├─ authenticate JWT → get tenant_id
+ │               ├─ check availability
+ │               ├─ create row in active_rentals (due_date, amount)
+ │               └─ return rental info → Frontend redirects to “My Rentals”
+ │
+ ├─> Notifications
+ │           System scheduler → check active_rentals → due soon? → insert row in notifications
+ │           Frontend GET /notifications/ → show reminders
+ │
+ ├─> Report Maintenance Issue
+ │           Frontend POST /reports/ → Backend
+ │               ├─ link report to room/building
+ │               ├─ store reporter_id
+ │               ├─ save content & status
+ │           Admins GET /reports/?status=unresolved → PATCH /reports/<id>/resolve/ → status updated
+ │
+ └─> Admin Management
+             ├─ POST /buildings/ → create building
+             └─ POST /rooms/ → create room under building
